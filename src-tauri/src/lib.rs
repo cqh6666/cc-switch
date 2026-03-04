@@ -3,6 +3,7 @@ mod app_store;
 mod auto_launch;
 mod claude_mcp;
 mod claude_plugin;
+mod cli;
 mod codex_config;
 mod commands;
 mod config;
@@ -190,6 +191,11 @@ fn macos_tray_icon() -> Option<Image<'static>> {
 pub fn run() {
     // 设置 panic hook，在应用崩溃时记录日志到 <app_config_dir>/crash.log（默认 ~/.cc-switch/crash.log）
     panic_hook::setup_panic_hook();
+
+    // 终端子命令模式：命中 CLI 命令后直接执行并退出，不启动 GUI。
+    if let Some(exit_code) = cli::maybe_run_from_process_args() {
+        std::process::exit(exit_code);
+    }
 
     let mut builder = tauri::Builder::default();
 
